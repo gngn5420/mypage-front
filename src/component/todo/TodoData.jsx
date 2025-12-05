@@ -5,13 +5,13 @@ export const MockTodo = [
   {
     id: 0,
     isDone: false,
-    content: "React 공부하기",
+    content: "낮잠자기",
     createDate: new Date().getTime(),
   },
   {
     id: 1,
     isDone: false,
-    content: "빨래 널기",
+    content: "웹툰보기",
     createDate: new Date().getTime(),
   },
   {

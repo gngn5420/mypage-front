@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
+import './EconomyNews.css'
 import {
-  Settings,
   Search,
   RefreshCw,
   FileText,
   Copy,
   Zap,
-  Activity,
   BookOpen,
 } from "lucide-react";
 
 const EconomyNews = () => {
-  // ⭐️ 1. 상태 정의 (Hooks) - 컴포넌트 최상단에 위치해야 합니다.
-  const [showSettings, setShowSettings] = useState(false); // 설정 창 토글 상태
+  // ⭐️ 1. 상태 정의 (Hooks) 
   const [config, setConfig] = useState({ googleKey: "" }); // googleAPI 키 저장
   const [selectedModel, setSelectedModel] = useState(""); // AI 모델 이름 
   const [isProcessing, setIsProcessing] = useState(false); // 뉴스 분석 중인지 표시
@@ -21,7 +19,7 @@ const EconomyNews = () => {
   const [newsData, setNewsData] = useState({ kr: [], us: [], coin: [] }); // 뉴스데이터 (한국, 미국, 코인)
   const [activeTab, setActiveTab] = useState("kr"); // 현재 선택된 뉴스 탭
 
-  // 각 섹터별로 뉴스 검색 조건과 언어 설정 (뉴스 갱신을 위해 when:12h 추가)
+  // 각 섹터별로 뉴스 검색 조건과 언어 설정
   const sectors = [
     { id: "kr", name: "🇰🇷 한국", query: "경제 OR 주식 OR 금융 when:12h", lang: "ko" },
     { id: "us", name: "🇺🇸 미국", query: "US Economy OR Stock Market when:12h", lang: "en" },
@@ -42,12 +40,6 @@ const EconomyNews = () => {
     }
   }, []);
 
-
-  // 2. 설정 토글 함수 정의
-  const toggleSettings = () => {
-    setShowSettings(prev => !prev);
-  };
-
   const showToast = (msg) => {
     setToast({ show: true, msg });
     setTimeout(() => setToast({ show: false, msg: "" }), 2000);
@@ -62,16 +54,14 @@ const EconomyNews = () => {
 
     try {
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`
-      );
+        `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
       const data = await res.json();
 
       if (data.error) throw new Error(data.error.message);
 
       const validModels =
         data.models?.filter((m) =>
-          m.supportedGenerationMethods?.includes("generateContent")
-        ) || [];
+          m.supportedGenerationMethods?.includes("generateContent")) || [];
 
       if (validModels.length === 0)
         throw new Error("사용 가능한 모델 없음");
@@ -109,7 +99,6 @@ const EconomyNews = () => {
 
     try {
       const modelName = selectedModel.replace("models/", "");
-
       const prompt = `
 Role: Professional Financial Analyst.
 
@@ -126,7 +115,6 @@ Constraints:
 Title: "${title}"
 Content: "${snippet}"
 `;
-
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${config.googleKey}`,
         {
@@ -151,7 +139,7 @@ Content: "${snippet}"
 
   // 3. 브리핑 시작
   const startBriefing = async () => {
-    if (!selectedModel) return alert("설정(⚙️)에서 키를 저장하고 스캔해주세요.");
+    if (!selectedModel) return alert("Google API Key를 저장하고 스캔해주세요.");
 
     setIsProcessing(true);
     setNewsData({ kr: [], us: [], coin: [] });
@@ -160,7 +148,7 @@ Content: "${snippet}"
       setStatusMsg(`🔎 ${sector.name} 중요 뉴스 수집 중...`);
 
       try {
-        // ⭐️ 캐시 무력화를 위해 Google News RSS URL에 cachebuster 파라미터를 추가했습니다.
+        // ⭐️ 캐시 무력화를 위해 Google News RSS URL에 cachebuster 파라미터를 추가.
         const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(
           sector.query
         )}&hl=${sector.lang === "ko" ? "ko" : "en-US"}&gl=${sector.lang === "ko" ? "KR" : "US"
@@ -227,10 +215,34 @@ Content: "${snippet}"
     document.body.removeChild(textArea);
   };
 
-  return (
-    <div className="min-h-screen bg-stone-50 font-sans text-stone-800 flex justify-center pb-10 relative">
+  // 6시간 뒤 자동 업데이트 + 로컬 캐시 로딩
+  useEffect(() => {
+    const lastUpdate = localStorage.getItem("newsLastTime");
+    const now = Date.now();
 
-      {/* 토스트 */}
+    // 최신 데이터 캐시가 존재하면 불러오기
+    const cachedData = localStorage.getItem("newsCache");
+    if (cachedData) {
+      setNewsData(JSON.parse(cachedData));
+    }
+
+    // 6시간(21600000ms) 지났거나 기록이 없으면 새로 뉴스 요청
+    if (!lastUpdate || now - Number(lastUpdate) > 1000 * 60 * 60 * 6) {
+      startBriefing();
+      localStorage.setItem("newsLastTime", now);
+    }
+  }, []);
+
+  useEffect(() => {
+    // 빈 데이터는 저장하지 않음
+    if (newsData && (newsData.kr.length || newsData.us.length || newsData.coin.length)) {
+      localStorage.setItem("newsCache", JSON.stringify(newsData));
+    }
+  }, [newsData]);
+
+  return (
+    <div className="min-h-screen bg-[#fafafa] text-stone-800 font-sans">
+      {/* 토스트 : 하단의 진행사항 알림 메세지*/}
       {toast.show && (
         <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50">
           <div className="bg-stone-800 text-white px-4 py-2 rounded-full shadow-xl text-xs font-bold">
@@ -239,32 +251,24 @@ Content: "${snippet}"
         </div>
       )}
 
-      {/* 메인 박스 */}
-      <div className="w-full max-w-md bg-white shadow-xl min-h-screen flex flex-col border-x border-stone-200">
+      {/* 메인 콘텐츠 캔버스 */}
+      <div className="w-full max-w-4xl mx-auto min-h-screen bg-white flex flex-col px-12 pb-12">
 
-        {/* 헤더 */}
-        <header className="px-6 pt-6 pb-4 bg-white sticky top-0 z-30 border-b border-stone-100">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h1 className="text-2xl font-black text-stone-900 tracking-tight flex items-center gap-2">
-                <BookOpen className="text-amber-600" /> 모닝경제
+        {/* 상단 영역 */}
+        <header className="pt-12 pb-12 bg-white sticky top-0 z-30 border-b border-stone-200">
+          <div className="space-y-4">
+            <h3 className="text-[11px] tracking-wider text-stone-400 font-semibold uppercase">
+              Daily Briefing
+            </h3>
+
+            <div className="flex justify-between items-start gap-10">
+              <h1 className="text-3xl font-extrabold text-stone-900 tracking-tight flex items-center gap-2 leading-tight">
+                <BookOpen className="text-amber-600" /> 오늘의 경제뉴스
               </h1>
-              {/* 'Premium Edition' 텍스트 삭제 완료 */}
-            </div>
 
-            {/* 설정 */}
-            <div className="relative group">
-              <button
-                onClick={toggleSettings} // ⭐️ 클릭 토글 기능 추가
-                className="p-2 bg-stone-100 rounded-full hover:bg-stone-200 transition-colors"
-              >
-                <Settings size={18} className="text-stone-600" />
-              </button>
-
-              {/* ⭐️ showSettings 상태에 따라 block/hidden을 결정하도록 수정 */}
-              <div className={`absolute right-0 mt-2 w-72 bg-white border border-stone-200 shadow-xl rounded-xl p-4 z-30 ${showSettings ? "block" : "hidden"
-                }`}>
-                <label className="text-[10px] font-bold text-stone-500 mb-1 block">
+              {/* 설정 박스 - 항상 표시 */}
+              <div className="w-80 border border-stone-200 rounded-xl bg-white p-5 flex flex-col gap-4">
+                <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wide">
                   Google API Key
                 </label>
 
@@ -272,20 +276,20 @@ Content: "${snippet}"
                   type="password"
                   value={config.googleKey}
                   onChange={(e) => setConfig({ googleKey: e.target.value })}
-                  className="w-full p-2 border rounded text-xs mb-2 outline-none bg-stone-50"
+                  className="w-full p-2 border rounded text-xs outline-none bg-stone-50"
                   placeholder="AIza..."
                 />
 
                 <button
                   onClick={scanAndSave}
-                  className="w-full py-2 bg-stone-800 text-white text-xs font-bold rounded hover:bg-black flex items-center justify-center gap-2"
+                  className="w-full py-2 bg-stone-900 text-white text-xs font-bold rounded-lg hover:bg-black flex items-center justify-center gap-2 transition-colors"
                 >
                   <Search size={12} /> 저장 및 모델 스캔
                 </button>
 
                 {selectedModel && (
-                  <div className="mt-2 p-2 bg-green-50 text-green-700 rounded text-[10px] font-bold text-center border border-green-100">
-                    ✅ 연결됨: {selectedModel.replace("models/", "")}
+                  <div className="p-2 bg-green-50 text-green-700 rounded text-[10px] font-bold text-center border border-green-100">
+                    연결됨: {selectedModel.replace("models/", "")}
                   </div>
                 )}
               </div>
@@ -293,101 +297,108 @@ Content: "${snippet}"
           </div>
         </header>
 
-        {/* 상태창 & 버튼 */}
-        <div className="px-6 py-4">
-          <div
-            className={`mb-4 p-3 rounded-xl text-center text-xs font-bold border ${isProcessing
+        {/* 메인 영역 */}
+        <main className="mt-10 space-y-10">
+
+          {/* 상태바 + 버튼 */}
+          <section className="space-y-6">
+            <div
+              className={`p-4 rounded-lg text-center text-xs font-bold border ${isProcessing
                 ? "bg-amber-50 text-amber-700 border-amber-100 animate-pulse"
                 : "bg-stone-50 text-stone-500 border-stone-100"
-              }`}
-          >
-            {isProcessing ? (
-              <RefreshCw size={12} className="inline animate-spin mr-2" />
-            ) : (
-              <Zap size={12} className="inline mr-2" />
-            )}
-            {statusMsg}
-          </div>
-
-          <button
-            onClick={startBriefing}
-            disabled={isProcessing}
-            className={`w-full py-4 rounded-2xl font-bold text-lg text-white shadow-lg flex items-center justify-center gap-2 ${isProcessing
-                ? "bg-stone-300"
-                : "bg-gradient-to-r from-amber-600 to-orange-600 hover:shadow-amber-200"
-              }`}
-          >
-            {isProcessing ? (
-              "뉴스 분석 중..."
-            ) : (
-              <>
-                <FileText size={18} /> 브리핑 시작
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* 탭 */}
-        <div className="px-6 mt-2 flex gap-2 border-b border-stone-100">
-          {sectors.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setActiveTab(s.id)}
-              className={`flex-1 pb-3 text-sm font-bold border-b-2 ${activeTab === s.id
-                  ? "text-stone-900 border-stone-900"
-                  : "text-stone-400 border-transparent hover:text-stone-600"
                 }`}
             >
-              {s.name}
-              <span className="text-[10px] bg-stone-100 px-1.5 rounded-full ml-1 text-stone-500">
-                {newsData[s.id].length}
-              </span>
-            </button>
-          ))}
-        </div>
-
-        {/* 뉴스 리스트 */}
-        <div className="flex-1 bg-stone-50 p-4 overflow-y-auto">
-          {newsData[activeTab].length === 0 ? (
-            <div className="h-48 flex flex-col items-center justify-center text-stone-300">
-              <FileText size={48} className="mb-2 opacity-20" />
-              <p className="text-xs">
-                {isProcessing ? "뉴스를 가져오는 중입니다..." : "버튼을 눌러 시작하세요."}
-              </p>
+              {isProcessing ? (
+                <RefreshCw size={12} className="inline animate-spin mr-2" />
+              ) : (
+                <Zap size={12} className="inline mr-2" />
+              )}
+              {statusMsg}
             </div>
-          ) : (
-            <div className="space-y-4">
-              {newsData[activeTab].map((news, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white p-5 rounded-2xl shadow-sm border border-stone-100"
+
+            <button
+              onClick={startBriefing}
+              disabled={isProcessing}
+              className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-sm flex items-center justify-center gap-3 ${isProcessing
+                ? "bg-stone-300"
+                : "bg-gradient-to-r from-amber-600 to-orange-600 hover:shadow-md"
+                } transition-shadow`}
+            >
+              {isProcessing ? (
+                "뉴스 분석 중..."
+              ) : (
+                <>
+                  <FileText size={18} /> 브리핑 시작
+                </>
+              )}
+            </button>
+          </section>
+
+          {/* 탭 */}
+          <section>
+            <div className="flex gap-4 border-b border-stone-200">
+              {sectors.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setActiveTab(s.id)}
+                  className={`flex-1 pb-3 text-sm font-bold border-b-2 transition-colors ${activeTab === s.id
+                    ? "text-stone-900 border-stone-900"
+                    : "text-stone-400 hover:text-stone-600 border-transparent"
+                    }`}
                 >
-                  <h3 className="text-md font-bold text-stone-800 mb-3">
-                    {news.title}
-                  </h3>
-
-                  <div className="bg-amber-50 p-4 rounded-xl border border-amber-100">
-                    <p className="text-xs text-stone-600 whitespace-pre-wrap leading-relaxed">
-                      {news.summary}
-                    </p>
-                  </div>
-
-                  <div className="flex justify-end">
-                    <button
-                      onClick={() => handleCopyLink(news.link)}
-                      className="flex items-center gap-1 text-[11px] font-bold text-white bg-stone-800 hover:bg-black px-4 py-2 rounded-lg"
-                    >
-                      <Copy size={12} /> 링크 복사
-                    </button>
-                  </div>
-                </div>
+                  {s.name}
+                  <span className="text-[10px] bg-stone-100 px-1.5 rounded-full ml-1 text-stone-600">
+                    {newsData[s.id].length}
+                  </span>
+                </button>
               ))}
             </div>
-          )}
-        </div>
+          </section>
+
+          {/* 뉴스 콘텐츠 */}
+          <section className="flex-1">
+            {newsData[activeTab].length === 0 ? (
+              <div className="h-52 flex flex-col items-center justify-center text-stone-300">
+                <FileText size={48} className="mb-2 opacity-20" />
+                <p className="text-xs">
+                  {isProcessing ? "뉴스를 가져오는 중입니다..." : "브리핑을 시작하세요."}
+                </p>
+              </div>
+            ) : (
+
+              <div className="space-y-10">
+                {newsData[activeTab].map((news, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white p-6 rounded-xl border border-stone-200 max-w-3xl mx-auto"
+                  >
+                    <h3 className="text-base font-bold text-stone-900 mb-3 leading-tight">
+                      {news.title}
+                    </h3>
+
+                    <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                      <p className="text-xs text-stone-700 whitespace-pre-wrap leading-relaxed">
+                        {news.summary}
+                      </p>
+                    </div>
+
+                    <div className="flex justify-end mt-3">
+                      <button
+                        onClick={() => handleCopyLink(news.link)}
+                        className="flex items-center gap-1.5 text-[11px] font-bold text-white bg-stone-900 hover:bg-black px-4 py-2 rounded-lg transition-colors"
+                      >
+                        <Copy size={12} /> 링크 복사
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </main>
       </div>
     </div>
   );
-};
+}
 
-export default EconomyNews;
+export default EconomyNews

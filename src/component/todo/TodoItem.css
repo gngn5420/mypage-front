@@ -1,10 +1,27 @@
 /* 할 일 아이템 박스 스타일 적용 */
-.TodoItem{
+.TodoItem {
   display: flex;
   align-items: center;
+  /* justify-content: flex-start; 체크박스 + 텍스트 왼쪽 정렬 */
+  /* text-align: left; */
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  background: transparent;
+  margin: 0;        /* 카드 느낌 제거 */
   gap: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgb(240, 240, 240);
+}
+
+.list_wrapper {
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+
+
+.TodoItem:last-child {
+  border-bottom: none;
 }
 
 /* 체크박스를 감싼 박스에 스타일 적용 */
@@ -18,9 +35,11 @@
 }
 
 /* 할 일 아이템 등록 시간을 감싼 박스에 스타일 적용 */
-.TodoItem .date_col{
+.TodoItem .date_col {
   font-size: 14px;
-  color: grey;
+  color: #888;
+  min-width: 90px;
+  text-align: right;
 }
 
 /* 삭제 버튼에 스타일 적용 */
@@ -32,3 +51,42 @@
   border-radius: 5px;
   padding: 5px;
 }
+
+/* 텍스트 */
+.TodoItem .title_col {
+  flex: 1;
+  font-size: 16px;
+  color: #333;
+}
+
+/* 커스텀 체크박스 크기 + 스타일 */
+.TodoItem input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  border: 2px solid #bbb;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  background: white;
+  transition: 0.2s;
+}
+
+/* 체크됐을 때 */
+.TodoItem input[type="checkbox"]:checked {
+  background: #4a90e2;
+  border-color: #4a90e2;
+}
+
+/* 체크 표시(✔) */
+.TodoItem input[type="checkbox"]:checked::after {
+  content: "✔";
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  position: absolute;
+  left: 4px;
+  top: -1px;
+}
+
