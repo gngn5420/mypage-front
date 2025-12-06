@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const LoginScreen = ({ setIsLoggedIn, setAuthMode, setShowAuth }) => {
+const LoginScreen = ({ setIsLoggedIn }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    
+    const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -14,30 +17,43 @@ const LoginScreen = ({ setIsLoggedIn, setAuthMode, setShowAuth }) => {
             return;
         }
 
-        // 로그인 성공 처리
-        console.log("로그인 시도:", { username, password });
         setIsLoggedIn(true);
-        setShowAuth(false); // 인증창 닫기
+
+        // 로그인 성공 → 메인 페이지로 이동
+        navigate("/");
     };
 
     return (
         <div
             style={{
                 minHeight: "100vh",
-                backgroundColor: "#f6f7f8",
+                background: "#EFEDE7",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                padding: "20px",
+                padding: "30px",
             }}
         >
+            <div
+                style={{
+                    fontSize: "13px",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
+                    opacity: 0.55,
+                    marginBottom: "20px",
+                }}
+            >
+                access your daily log
+            </div>
+
             <h1
                 style={{
-                    fontSize: "30px",
-                    fontWeight: "800",
-                    color: "#111",
-                    marginBottom: "40px",
+                    fontSize: "22px",
+                    fontWeight: 400,
+                    letterSpacing: "0.8px",
+                    marginBottom: "30px",
+                    color: "#333",
                 }}
             >
                 로그인
@@ -46,63 +62,80 @@ const LoginScreen = ({ setIsLoggedIn, setAuthMode, setShowAuth }) => {
             <form
                 onSubmit={handleSubmit}
                 style={{
-                    width: "350px",
+                    width: "360px",
+                    background: "#F7F6F2",
+                    border: "1px solid rgba(0,0,0,0.08)",
+                    padding: "35px 30px",
                     display: "flex",
                     flexDirection: "column",
-                    gap: "12px",
+                    gap: "18px",
                 }}
             >
                 {errorMessage && (
-                    <p style={{ color: "#ef4444", fontSize: "14px" }}>
+                    <p style={{ color: "#b33a3a", fontSize: "14px" }}>
                         {errorMessage}
                     </p>
                 )}
 
-                <input
-                    type="text"
-                    placeholder="아이디"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    style={{
-                        padding: "14px",
-                        width: "100%",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "10px",
-                        fontSize: "15px",
-                        backgroundColor: "#f1f5fd",
-                        boxSizing: "border-box",
-                    }}
-                />
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <label
+                        style={{
+                            fontSize: "13px",
+                            opacity: 0.7,
+                            letterSpacing: "0.5px",
+                        }}
+                    >
+                        아이디
+                    </label>
+                    <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        style={{
+                            padding: "12px",
+                            border: "1px solid rgba(0,0,0,0.15)",
+                            background: "#F5F4EF",
+                            fontSize: "15px",
+                            letterSpacing: "0.3px",
+                        }}
+                    />
+                </div>
 
-                <input
-                    type="password"
-                    placeholder="비밀번호"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    style={{
-                        padding: "14px",
-                        width: "100%",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "10px",
-                        fontSize: "15px",
-                        backgroundColor: "#f1f5fd",
-                        boxSizing: "border-box",
-                    }}
-                />
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <label
+                        style={{
+                            fontSize: "13px",
+                            opacity: 0.7,
+                            letterSpacing: "0.5px",
+                        }}
+                    >
+                        비밀번호
+                    </label>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        style={{
+                            padding: "12px",
+                            border: "1px solid rgba(0,0,0,0.15)",
+                            background: "#F5F4EF",
+                            fontSize: "15px",
+                            letterSpacing: "0.3px",
+                        }}
+                    />
+                </div>
 
                 <button
                     type="submit"
                     style={{
                         width: "100%",
-                        padding: "14px",
-                        backgroundColor: "#111",
+                        padding: "12px",
+                        background: "#333",
                         color: "white",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "10px",
-                        fontSize: "16px",
-                        fontWeight: "600",
+                        border: "none",
+                        fontSize: "15px",
+                        letterSpacing: "0.5px",
                         cursor: "pointer",
-                        transition: "opacity 0.2s",
                     }}
                 >
                     로그인
@@ -110,21 +143,21 @@ const LoginScreen = ({ setIsLoggedIn, setAuthMode, setShowAuth }) => {
 
                 <p
                     style={{
-                        marginTop: "18px",
+                        marginTop: "10px",
                         fontSize: "14px",
-                        color: "#555",
+                        color: "#444",
                         textAlign: "center",
+                        opacity: 0.8,
                     }}
                 >
                     계정이 없으신가요?
                     <span
-                        onClick={() => setAuthMode("register")}
+                        onClick={() => navigate("/register")}
                         style={{
                             cursor: "pointer",
-                            color: "#111",
-                            fontWeight: "600",
-                            marginLeft: "4px",
+                            marginLeft: "5px",
                             textDecoration: "underline",
+                            opacity: 0.9,
                         }}
                     >
                         회원가입

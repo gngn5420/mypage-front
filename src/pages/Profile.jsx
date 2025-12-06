@@ -1,177 +1,175 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Profile = ({ isLoggedIn, userInfo, setUserInfo }) => {
+const Profile = ({ isLoggedIn, userInfo = {}, setUserInfo }) => {
     const navigate = useNavigate();
 
     const [nickname, setNickname] = useState("");
     const [email, setEmail] = useState("");
-    const [currentPassword, setCurrentPassword] = useState("");
+    const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
-    // 로그인 안 했으면 로그인 페이지로 이동
+    // 로그인 UI와 동일한 input 스타일
+    const inputStyle = {
+        padding: "12px",
+        border: "1px solid rgba(0,0,0,0.15)",
+        background: "#F5F4EF",
+        fontSize: "15px",
+        letterSpacing: "0.3px",
+    };
+
     useEffect(() => {
         if (!isLoggedIn) {
             navigate("/login");
             return;
         }
+        setNickname(userInfo.nickname || "");
+        setEmail(userInfo.email || "");
+    }, [isLoggedIn, userInfo, navigate]);
 
-        // 로그인한 사용자 정보가 이미 있다면 UI에 반영
-        if (userInfo) {
-            setNickname(userInfo.nickname || "");
-            setEmail(userInfo.email || "");
-        } else {
-            // 서버에서 사용자 정보 가져오기 (예: /api/me)
-            fetch("/api/user/me", {
-                headers: {
-                    Authorization: "Bearer " + localStorage.getItem("token")
-                }
-            })
-                .then(res => res.json())
-                .then(data => {
-                    setUserInfo(data);
-                    setNickname(data.nickname);
-                    setEmail(data.email);
-                })
-                .catch(() => {
-                    navigate("/login");
-                });
-        }
-    }, [isLoggedIn, userInfo, navigate, setUserInfo]);
-
-    const handleSave = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         setErrorMessage("");
 
-        if (!currentPassword.trim()) {
+        if (!password.trim()) {
             setErrorMessage("비밀번호를 입력해야 수정이 가능합니다.");
             return;
         }
 
-        // DB 업데이트 API 호출 (예시)
-        const response = await fetch("/api/user/update", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + localStorage.getItem("token")
-            },
-            body: JSON.stringify({
-                nickname,
-                email,
-                currentPassword
-            })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            setErrorMessage(result.message || "업데이트 중 문제가 발생했습니다");
-            return;
-        }
-
-        // 프론트 상태 업데이트
-        setUserInfo(prev => ({
-            ...prev,
-            nickname,
-            email
-        }));
+        // 임시 저장 로직 (실 서버 연동 시 수정)
+        setUserInfo({ nickname, email });
 
         alert("프로필이 수정되었습니다!");
-        setCurrentPassword("");
+        navigate("/");
     };
 
     return (
         <div
             style={{
                 minHeight: "100vh",
-                backgroundColor: "#f6f7f8",
+                background: "#EFEDE7",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                padding: "20px",
+                padding: "30px",
             }}
         >
+            {/* 로그인과 동일한 상단 라벨 */}
+            <div
+                style={{
+                    fontSize: "13px",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
+                    opacity: 0.55,
+                    marginBottom: "20px",
+                }}
+            >
+                access your daily log
+            </div>
+
+            {/* 로그인과 동일한 제목 스타일 */}
             <h1
                 style={{
-                    fontSize: "30px",
-                    fontWeight: "800",
-                    color: "#111",
-                    marginBottom: "40px",
+                    fontSize: "22px",
+                    fontWeight: 400,
+                    letterSpacing: "0.8px",
+                    marginBottom: "30px",
+                    color: "#333",
                 }}
             >
                 프로필 관리
             </h1>
 
+            {/* 로그인 UI의 form 박스와 완전히 동일한 구조 */}
             <form
-                onSubmit={handleSave}
+                onSubmit={handleSubmit}
                 style={{
-                    width: "350px",
+                    width: "360px",
+                    background: "#F7F6F2",
+                    border: "1px solid rgba(0,0,0,0.08)",
+                    padding: "35px 30px",
                     display: "flex",
                     flexDirection: "column",
-                    gap: "12px",
+                    gap: "18px",
                 }}
             >
                 {errorMessage && (
-                    <p style={{ color: "#ef4444", fontSize: "14px", marginBottom: "5px" }}>
+                    <p style={{ color: "#b33a3a", fontSize: "14px" }}>
                         {errorMessage}
                     </p>
                 )}
 
-                <input
-                    type="text"
-                    placeholder="닉네임"
-                    value={nickname}
-                    onChange={(e) => setNickname(e.target.value)}
-                    style={{
-                        padding: "14px",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "10px",
-                        fontSize: "15px",
-                        backgroundColor: "#f1f5fd",
-                    }}
-                />
+                {/* 닉네임 */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <label
+                        style={{
+                            fontSize: "13px",
+                            opacity: 0.7,
+                            letterSpacing: "0.5px",
+                        }}
+                    >
+                        닉네임
+                    </label>
+                    <input
+                        type="text"
+                        value={nickname}
+                        onChange={(e) => setNickname(e.target.value)}
+                        style={inputStyle}
+                    />
+                </div>
 
-                <input
-                    type="email"
-                    placeholder="이메일"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    style={{
-                        padding: "14px",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "10px",
-                        fontSize: "15px",
-                        backgroundColor: "#f1f5fd",
-                    }}
-                />
+                {/* 이메일 */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <label
+                        style={{
+                            fontSize: "13px",
+                            opacity: 0.7,
+                            letterSpacing: "0.5px",
+                        }}
+                    >
+                        이메일
+                    </label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        style={inputStyle}
+                    />
+                </div>
 
-                <input
-                    type="password"
-                    placeholder="현재 비밀번호 입력"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    style={{
-                        padding: "14px",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "10px",
-                        fontSize: "15px",
-                        backgroundColor: "#f1f5fd",
-                    }}
-                />
+                {/* 비밀번호 확인 */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <label
+                        style={{
+                            fontSize: "13px",
+                            opacity: 0.7,
+                            letterSpacing: "0.5px",
+                        }}
+                    >
+                        현재 비밀번호
+                    </label>
+                    <input
+                        type="password"
+                        placeholder="변경 확인용 비밀번호"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        style={inputStyle}
+                    />
+                </div>
 
+                {/* 버튼 (로그인 UI 동일한 버튼 스타일) */}
                 <button
                     type="submit"
                     style={{
                         width: "100%",
-                        padding: "14px",
-                        backgroundColor: "#111",
+                        padding: "12px",
+                        background: "#333",
                         color: "white",
-                        borderRadius: "10px",
-                        fontSize: "16px",
-                        fontWeight: "600",
+                        border: "none",
+                        fontSize: "15px",
+                        letterSpacing: "0.5px",
                         cursor: "pointer",
-                        marginTop: "8px",
                     }}
                 >
                     변경사항 저장

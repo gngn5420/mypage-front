@@ -69,10 +69,10 @@
 import { useNavigate, useLocation } from "react-router-dom";
 
 const menuItems = [
-  { id: "home", path: "/", name: "MAIN VIEW", year: "2026", subtitle: "메인 화면" },
-  { id: "todo", path: "/todo", name: "TODO LIST", year: "2026", subtitle: "할 일" },
-  { id: "habit", path: "/habit", name: "HABIT TRACKER", year: "2026", subtitle: "습관" },
-  { id: "news", path: "/news", name: "ECONOMY NEWS", year: "2026", subtitle: "뉴스" },
+  { id: "home", path: "/", name: "MAIN", year: "2026", subtitle: "메인 화면" },
+  { id: "todo", path: "/todo", name: "TODO", year: "2026", subtitle: "할 일" },
+  { id: "habit", path: "/habit", name: "HABIT", year: "2026", subtitle: "습관" },
+  { id: "news", path: "/news", name: "NEWS", year: "2026", subtitle: "뉴스" },
   { id: "profile", path: "/profile", name: "MY PAGE", year: "2026", subtitle: "마이페이지" }
 ];
 
@@ -81,29 +81,79 @@ const Sidebar = () => {
   const location = useLocation();
 
   return (
-    <nav style={{ width: "300px", borderRight: "1px solid #eee", padding: "30px" }}>
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
+    // <nav style={{ width: "300px", borderRight: "1px solid #eee", padding: "30px" }}>
+    //   <ul style={{ listStyle: "none", padding: 0 }}>
+    //     {menuItems.map((item) => {
+    //       const isActive = location.pathname === item.path;
 
-          return (
-            <li
-              key={item.id}
-              onClick={() => navigate(item.path)}
-              style={{
-                background: isActive ? "#f0f0f0" : "transparent",
-                fontWeight: isActive ? "bold" : "normal",
-                padding: "10px 0",
-                borderBottom: "1px dashed #ccc",
-                cursor: "pointer",
-              }}
-            >
-              {item.name}
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+    //       return (
+    //         <li
+    //           key={item.id}
+    //           onClick={() => navigate(item.path)}
+    //           style={{
+    //             background: isActive ? "#f0f0f0" : "transparent",
+    //             fontWeight: isActive ? "bold" : "normal",
+    //             padding: "10px 0",
+    //             borderBottom: "1px dashed #ccc",
+    //             cursor: "pointer",
+    //           }}
+    //         >
+    //           {item.name}
+    //         </li>
+    //       );
+    //     })}
+    //   </ul>
+    // </nav>
+<nav
+  style={{
+    width: "260px",
+    padding: "50px 30px",
+    borderRight: "1px solid rgba(0,0,0,0.06)",
+    background: "#F8F7F4",
+    height: "100vh",
+  }}
+>
+  <div style={{
+    fontSize: "12px",
+    textTransform: "uppercase",
+    opacity: 0.45,
+    letterSpacing: "1.2px",
+    marginBottom: "30px"
+  }}>
+    Daily Log
+  </div>
+
+  <ul style={{ listStyle: "none", padding: 0 }}>
+    {menuItems.map((item) => {
+      const isActive = location.pathname === item.path;
+
+      return (
+        <li
+          key={item.id}
+          onClick={() => navigate(item.path)}
+          style={{
+            padding: "14px 8px",
+            cursor: "pointer",
+            borderBottom: "1px dashed rgba(0,0,0,0.15)",
+            opacity: isActive ? 1 : 0.55,
+            letterSpacing: "0.5px",
+            fontSize: "15px",
+            transition: "0.2s",
+          }}
+        >
+          <span>{item.name}</span>
+          <div style={{
+            fontSize: "11px",
+            opacity: 0.5,
+            marginTop: "2px"
+          }}>{item.subtitle}</div>
+        </li>
+      );
+    })}
+  </ul>
+</nav>
+
+
   );
 };
 
