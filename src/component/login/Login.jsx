@@ -26,7 +26,7 @@ const LoginScreen = ({ setIsLoggedIn }) => {
     return (
         <div
             style={{
-                minHeight: "100vh",
+                minHeight: "82vh",
                 background: "#EFEDE7",
                 display: "flex",
                 flexDirection: "column",

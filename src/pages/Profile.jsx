@@ -46,7 +46,7 @@ const Profile = ({ isLoggedIn, userInfo = {}, setUserInfo }) => {
     return (
         <div
             style={{
-                minHeight: "100vh",
+                minHeight: "82vh",
                 background: "#EFEDE7",
                 display: "flex",
                 flexDirection: "column",
@@ -147,11 +147,11 @@ const Profile = ({ isLoggedIn, userInfo = {}, setUserInfo }) => {
                             letterSpacing: "0.5px",
                         }}
                     >
-                        현재 비밀번호
+                        비밀번호
                     </label>
                     <input
                         type="password"
-                        placeholder="변경 확인용 비밀번호"
+                        placeholder="비밀번호를 입력해주세요"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         style={inputStyle}
