@@ -1,35 +1,75 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-const Profile = ({ isLoggedIn, userInfo, setUserInfo, setShowAuth, setAuthMode }) => {
+const Profile = ({ isLoggedIn, userInfo, setUserInfo }) => {
+    const navigate = useNavigate();
+
     const [nickname, setNickname] = useState("");
     const [email, setEmail] = useState("");
     const [currentPassword, setCurrentPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
+    // 로그인 안 했으면 로그인 페이지로 이동
     useEffect(() => {
         if (!isLoggedIn) {
-            setAuthMode("login");
-            setShowAuth(true);
+            navigate("/login");
             return;
         }
 
+        // 로그인한 사용자 정보가 이미 있다면 UI에 반영
         if (userInfo) {
             setNickname(userInfo.nickname || "");
             setEmail(userInfo.email || "");
+        } else {
+            // 서버에서 사용자 정보 가져오기 (예: /api/me)
+            fetch("/api/user/me", {
+                headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token")
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    setUserInfo(data);
+                    setNickname(data.nickname);
+                    setEmail(data.email);
+                })
+                .catch(() => {
+                    navigate("/login");
+                });
         }
-    }, [isLoggedIn, userInfo, setShowAuth, setAuthMode]);
+    }, [isLoggedIn, userInfo, navigate, setUserInfo]);
 
-    const handleSave = (e) => {
+    const handleSave = async (e) => {
         e.preventDefault();
         setErrorMessage("");
 
-        // 비밀번호 확인
         if (!currentPassword.trim()) {
-            setErrorMessage("변경사항을 저장하려면 현재 비밀번호를 입력해야 합니다.");
+            setErrorMessage("비밀번호를 입력해야 수정이 가능합니다.");
             return;
         }
 
-        // 실제 업데이트는 API로 보내야 하지만 지금은 프론트 상태 변경만 수행
+        // DB 업데이트 API 호출 (예시)
+        const response = await fetch("/api/user/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + localStorage.getItem("token")
+            },
+            body: JSON.stringify({
+                nickname,
+                email,
+                currentPassword
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            setErrorMessage(result.message || "업데이트 중 문제가 발생했습니다");
+            return;
+        }
+
+        // 프론트 상태 업데이트
         setUserInfo(prev => ({
             ...prev,
             nickname,
@@ -78,7 +118,6 @@ const Profile = ({ isLoggedIn, userInfo, setUserInfo, setShowAuth, setAuthMode }
                     </p>
                 )}
 
-                {/* 닉네임 */}
                 <input
                     type="text"
                     placeholder="닉네임"
@@ -93,7 +132,6 @@ const Profile = ({ isLoggedIn, userInfo, setUserInfo, setShowAuth, setAuthMode }
                     }}
                 />
 
-                {/* 이메일 */}
                 <input
                     type="email"
                     placeholder="이메일"
@@ -108,7 +146,6 @@ const Profile = ({ isLoggedIn, userInfo, setUserInfo, setShowAuth, setAuthMode }
                     }}
                 />
 
-                {/* 현재 비밀번호 */}
                 <input
                     type="password"
                     placeholder="현재 비밀번호 입력"
@@ -123,7 +160,6 @@ const Profile = ({ isLoggedIn, userInfo, setUserInfo, setShowAuth, setAuthMode }
                     }}
                 />
 
-                {/* 저장 버튼 */}
                 <button
                     type="submit"
                     style={{
@@ -136,7 +172,6 @@ const Profile = ({ isLoggedIn, userInfo, setUserInfo, setShowAuth, setAuthMode }
                         fontWeight: "600",
                         cursor: "pointer",
                         marginTop: "8px",
-                        transition: "opacity 0.2s",
                     }}
                 >
                     변경사항 저장

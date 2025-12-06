@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import './EconomyNews.css'
+// import './EconomyNews.css'
 import {
   Search,
   RefreshCw,
   FileText,
   Copy,
   Zap,
-  BookOpen,
+  ChartNoAxesCombined,
 } from "lucide-react";
 
 const EconomyNews = () => {
@@ -241,122 +241,128 @@ Content: "${snippet}"
   }, [newsData]);
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-stone-800 font-sans">
-      {/* 토스트 : 하단의 진행사항 알림 메세지*/}
-      {toast.show && (
-        <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-stone-800 text-white px-4 py-2 rounded-full shadow-xl text-xs font-bold">
-            {toast.msg}
+    // ⭐⭐⭐ div — EconomyNews 자체를 중앙 정렬 ⭐⭐⭐
+    <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+      {/* 내부 컨테이너는 기존 코드 + 폭 제한 추가 */}
+      <div
+        className="min-h-screen bg-[#fafafa] text-stone-800 font-sans"
+        style={{ maxWidth: "900px", width: "100%" }}
+      >
+        {toast.show && (
+          <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50">
+            <div className="bg-stone-800 text-white px-4 py-2 rounded-full shadow-xl text-xs font-bold">
+              {toast.msg}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* 메인 콘텐츠 캔버스 */}
-      <div className="w-full max-w-4xl mx-auto min-h-screen bg-white flex flex-col px-12 pb-12">
-
-        {/* 상단 영역 */}
-        <header className="pt-12 pb-12 bg-white sticky top-0 z-30 border-b border-stone-200">
-          <div className="space-y-4">
-            <h3 className="text-[11px] tracking-wider text-stone-400 font-semibold uppercase">
-              Daily Briefing
-            </h3>
-
-            <div className="flex justify-between items-start gap-10">
-              <h1 className="text-3xl font-extrabold text-stone-900 tracking-tight flex items-center gap-2 leading-tight">
-                <BookOpen className="text-amber-600" /> 오늘의 경제뉴스
-              </h1>
-
-              {/* 설정 박스 - 항상 표시 */}
-              <div className="w-80 border border-stone-200 rounded-xl bg-white p-5 flex flex-col gap-4">
-                <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wide">
-                  Google API Key
-                </label>
-
-                <input
-                  type="password"
-                  value={config.googleKey}
-                  onChange={(e) => setConfig({ googleKey: e.target.value })}
-                  className="w-full p-2 border rounded text-xs outline-none bg-stone-50"
-                  placeholder="AIza..."
-                />
-
-                <button
-                  onClick={scanAndSave}
-                  className="w-full py-2 bg-stone-900 text-white text-xs font-bold rounded-lg hover:bg-black flex items-center justify-center gap-2 transition-colors"
+        <div className="w-full max-w-4xl mx-auto min-h-screen bg-white flex flex-col px-12 pb-12">
+          <header className="pt-12 pb-12 bg-white sticky top-0 z-30 border-b border-stone-200">
+            <div className="space-y-4" style={{ textAlign: "center" }}>
+              <div className="flex flex-col items-center gap-6">
+                <h1
+                  className="text-3xl font-extrabold text-stone-900 tracking-tight flex items-center leading-tight"
+                  style={{ marginBottom: "30px" }}
                 >
-                  <Search size={12} /> 저장 및 모델 스캔
-                </button>
+                  <ChartNoAxesCombined className="text-amber-600 text-3xl mr-3" />
+                  오늘의 경제뉴스
+                </h1>
 
-                {selectedModel && (
-                  <div className="p-2 bg-green-50 text-green-700 rounded text-[10px] font-bold text-center border border-green-100">
-                    연결됨: {selectedModel.replace("models/", "")}
-                  </div>
-                )}
+                <div className="w-80 border border-stone-200 rounded-xl bg-white p-5 flex flex-col gap-4">
+                  <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wide">
+                    Google API Key
+                  </label>
+
+                  <input
+                    type="password"
+                    value={config.googleKey}
+                    onChange={(e) => setConfig({ googleKey: e.target.value })}
+                    className="w-full p-2 border rounded text-xs outline-none bg-stone-50"
+                    placeholder="AIza..."
+                  />
+
+                  <button
+                    onClick={scanAndSave}
+                    className="w-full py-2 bg-stone-900 text-white text-xs font-bold rounded-lg hover:bg-black flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <Search size={12} /> 저장 및 모델 스캔
+                  </button>
+
+                  {selectedModel && (
+                    <div className="p-2 bg-green-50 text-green-700 rounded text-[10px] font-bold text-center border border-green-100">
+                      연결됨: {selectedModel.replace("models/", "")}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </header>
+          </header>
 
-        {/* 메인 영역 */}
-        <main className="mt-10 space-y-10">
+          <main className="mt-10 space-y-10">
+            <section className="space-y-6" style={{ textAlign: "center" }}>
+              <div
+                className={`p-4 rounded-lg text-center text-xs font-bold border ${isProcessing
+                  ? "bg-amber-50 text-amber-700 border-amber-100 animate-pulse"
+                  : "bg-stone-50 text-stone-500 border-stone-100"
+                  }`}
+              >
+                {isProcessing ? (
+                  <RefreshCw size={12} className="inline animate-spin mr-2" />
+                ) : (
+                  <Zap size={12} className="inline mr-2" />
+                )}
+                {statusMsg}
+              </div>
 
-          {/* 상태바 + 버튼 */}
-          <section className="space-y-6">
-            <div
-              className={`p-4 rounded-lg text-center text-xs font-bold border ${isProcessing
-                ? "bg-amber-50 text-amber-700 border-amber-100 animate-pulse"
-                : "bg-stone-50 text-stone-500 border-stone-100"
-                }`}
-            >
-              {isProcessing ? (
-                <RefreshCw size={12} className="inline animate-spin mr-2" />
-              ) : (
-                <Zap size={12} className="inline mr-2" />
-              )}
-              {statusMsg}
-            </div>
+              <button
+                onClick={startBriefing}
+                disabled={isProcessing}
+                className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-sm flex items-center justify-center gap-3 ${isProcessing
+                  ? "bg-stone-300"
+                  : "bg-gradient-to-r from-amber-600 to-orange-600 hover:shadow-md"
+                  } transition-shadow`}
+              >
+                {isProcessing ? (
+                  "뉴스 분석 중..."
+                ) : (
+                  <>
+                    <FileText size={18} /> 브리핑 시작
+                  </>
+                )}
+              </button>
+            </section><br />
+            <section style={{ textAlign: "center", marginBottom: "50px" }}>
+              <div
+                className="flex border-b border-stone-200"
+                style={{ justifyContent: "center", gap: "12px" }}
+              >
+                {sectors.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setActiveTab(s.id)}
+                    className={`pb-3 text-sm font-bold border border-stone-300 rounded-lg transition-colors ${activeTab === s.id
+                        ? "text-stone-900 border-stone-900"
+                        : "text-stone-400 hover:text-stone-600"
+                      }`}
+                    style={{
+                      padding: "6px 8px",
+                      margin: "0 2px",        // 버튼 간 간격 확실하게 적용
+                      display: "inline-flex", // 내용 균형 잡힘
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    {s.name}
+                    <span className="text-[10px] bg-stone-100 px-1.5 rounded-full text-stone-600">
+                      {newsData[s.id].length}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </section>
 
-            <button
-              onClick={startBriefing}
-              disabled={isProcessing}
-              className={`w-full py-4 rounded-xl font-bold text-lg text-white shadow-sm flex items-center justify-center gap-3 ${isProcessing
-                ? "bg-stone-300"
-                : "bg-gradient-to-r from-amber-600 to-orange-600 hover:shadow-md"
-                } transition-shadow`}
-            >
-              {isProcessing ? (
-                "뉴스 분석 중..."
-              ) : (
-                <>
-                  <FileText size={18} /> 브리핑 시작
-                </>
-              )}
-            </button>
-          </section>
-
-          {/* 탭 */}
-          <section>
-            <div className="flex gap-4 border-b border-stone-200">
-              {sectors.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => setActiveTab(s.id)}
-                  className={`flex-1 pb-3 text-sm font-bold border-b-2 transition-colors ${activeTab === s.id
-                    ? "text-stone-900 border-stone-900"
-                    : "text-stone-400 hover:text-stone-600 border-transparent"
-                    }`}
-                >
-                  {s.name}
-                  <span className="text-[10px] bg-stone-100 px-1.5 rounded-full ml-1 text-stone-600">
-                    {newsData[s.id].length}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </section>
-
-          {/* 뉴스 콘텐츠 */}
-          <section className="flex-1">
+            {/* 가져온 뉴스 출력하는 부분*/}
+            <section className="flex-1">
             {newsData[activeTab].length === 0 ? (
               <div className="h-52 flex flex-col items-center justify-center text-stone-300">
                 <FileText size={48} className="mb-2 opacity-20" />
@@ -365,37 +371,52 @@ Content: "${snippet}"
                 </p>
               </div>
             ) : (
-
               <div className="space-y-10">
                 {newsData[activeTab].map((news, idx) => (
                   <div
-                    key={idx}
-                    className="bg-white p-6 rounded-xl border border-stone-200 max-w-3xl mx-auto"
-                  >
-                    <h3 className="text-base font-bold text-stone-900 mb-3 leading-tight">
-                      {news.title}
-                    </h3>
-
-                    <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
-                      <p className="text-xs text-stone-700 whitespace-pre-wrap leading-relaxed">
-                        {news.summary}
-                      </p>
-                    </div>
-
-                    <div className="flex justify-end mt-3">
-                      <button
-                        onClick={() => handleCopyLink(news.link)}
-                        className="flex items-center gap-1.5 text-[11px] font-bold text-white bg-stone-900 hover:bg-black px-4 py-2 rounded-lg transition-colors"
+                      key={idx}
+                      className="bg-white p-6 rounded-xl border border-stone-200 max-w-3xl mx-auto"
+                      style={{
+                        marginBottom: "80px",   // ← 뉴스 카드 사이 간격
+                      }}
+                    >
+                      <h3
+                        className="text-base font-bold text-stone-900 mb-3 leading-tight"
+                        style={{ textAlign: "center" }}
                       >
-                        <Copy size={12} /> 링크 복사
-                      </button>
+                        {news.title}
+                      </h3>
+
+                      <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                        <p className="text-xs text-stone-700 whitespace-pre-wrap leading-relaxed">
+                          {news.summary}
+                        </p>
+                      </div>
+
+                      {/* 버튼 가운데 정렬 확정 적용 */}
+                      <div
+                        className="flex justify-center mt-3"
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          justifyContent: "center",   // ← 강제 중앙 정렬
+                          marginTop: "20px",
+                        }}
+                      >
+                        <button
+                          onClick={() => handleCopyLink(news.link)}
+                          className="flex items-center gap-1.5 text-[11px] font-bold text-white bg-stone-900 hover:bg-black px-4 py-2 rounded-lg transition-colors"
+                        >
+                          <Copy size={12} /> 링크 복사
+                        </button>
+                      </div>
                     </div>
-                  </div>
                 ))}
               </div>
             )}
-          </section>
-        </main>
+          </section>     
+          </main>
+        </div>
       </div>
     </div>
   );

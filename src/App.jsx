@@ -1,78 +1,91 @@
-import { useState } from 'react';
-import SideBar from './component/main/SideBar';
-import TopNavi from './component/main/TopNavi'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState } from "react";
+
+import SideBar from "./component/main/SideBar";
+import TopNavi from "./component/main/TopNavi";
+
+import Login from "./component/login/Login";
 import Register from "./component/register/Register";
-import Login from './component/login/Login'
-import MainFrame from './component/main/MainFrame';
-import { useTodo } from './component/todo/TodoData'
+import MainFrame from "./component/main/MainFrame";
+import Profile from './pages/Profile';
+
+import { useTodo } from "./component/todo/TodoData";
+import ProtectedRoute from "./pages/ProtectRoute";
+import NotFound from "./pages/NotFound";
 
 const App = () => {
-    const [activeItem, setActiveItem] = useState('home');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [authMode, setAuthMode] = useState("login");
-    const [showAuth, setShowAuth] = useState(false); 
-    const { todo, onCreate, onUpdate, onDelete } = useTodo();
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // 로그인 한 상태 
+  const { todo, onCreate, onUpdate, onDelete } = useTodo(); // todoList 자료 불러오기 
 
-    return (
-        <div style={{
-            height: '100vh',
-            width: '100%',
-            fontFamily: 'Inter, sans-serif',
-            display: 'flex',
-            flexDirection: 'column'
-        }}>
+  return (
+    <BrowserRouter>
+      <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+        <TopNavi isLoggedIn={isLoggedIn} />
 
-            {/* 상단 네비 */}
-            <TopNavi
-                setShowAuth={setShowAuth}
-                setAuthMode={setAuthMode}
-                setActiveItem={setActiveItem}   // 🔥 추가
-            />
+        <div style={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
+          <SideBar isLoggedIn={isLoggedIn} />
 
-            {/* Sidebar + main */}
-            <div style={{
-                display: 'flex',
-                flexGrow: 1,
-                overflow: 'hidden'
-            }}>
+          <section style={{ flexGrow: 1, overflowY: "auto", background: "#fafafa" }}>
+            <Routes>
+              {/* PUBLIC ROUTES */}
+              <Route path="/" element={<MainFrame activeId="home" />} />
+              <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+              <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
 
-                <SideBar
-                    activeItem={activeItem}
-                    setActiveItem={setActiveItem}
-                    setShowAuth={setShowAuth}   // 이거 실제로 들어가 있어야 함
-                />
+              {/* PRIVATE ROUTES */}
+              <Route
+                path="/todo"
+                element={
+                  <ProtectedRoute isLoggedIn={isLoggedIn}>
+                    <MainFrame
+                      activeId="todo"
+                      todo={todo}
+                      onCreate={onCreate}
+                      onUpdate={onUpdate}
+                      onDelete={onDelete}
+                    />
+                  </ProtectedRoute>
+                }
+              />
 
-                <section style={{
-                    flexGrow: 1,
-                    overflowY: 'auto',
-                    backgroundColor: '#fafafa'
-                }}>
-                    {
-                        showAuth
-                            ? (
-                                authMode === "login"
-                                    ? <Login
-                                        setIsLoggedIn={setIsLoggedIn}
-                                        setAuthMode={setAuthMode}
-                                        setShowAuth={setShowAuth}
-                                    />
-                                    : <Register
-                                        setIsLoggedIn={setIsLoggedIn}
-                                        setAuthMode={setAuthMode}
-                                        setShowAuth={setShowAuth}
-                                    />
-                            )
-                            : <MainFrame activeId={activeItem}
-                                todo={todo}
-                                onCreate={onCreate}
-                                onUpdate={onUpdate}
-                                onDelete={onDelete} />}
-                </section>
-            </div>
+              <Route
+                path="/habit"
+                element={
+                  <ProtectedRoute isLoggedIn={isLoggedIn}>
+                    <MainFrame activeId="habit" />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/news"
+                element={
+                  <ProtectedRoute isLoggedIn={isLoggedIn}>
+                    <MainFrame activeId="news" />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute isLoggedIn={isLoggedIn}>
+                    <Profile
+                      isLoggedIn={isLoggedIn}
+                      userInfo={{ email: "test@test.com", nickname: "홍길동" }} // 임시
+                      setUserInfo={() => {}}
+                    />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </section>
         </div>
-    );
+      </div>
+    </BrowserRouter>
+  );
 };
 
 export default App;
-
-
