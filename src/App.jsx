@@ -7,7 +7,8 @@ import TopNavi from "./component/main/TopNavi";
 import Login from "./component/login/Login";
 import Register from "./component/register/Register";
 import MainFrame from "./component/main/MainFrame";
-import Profile from './pages/Profile';
+import Profile from './component/profile/Profile';
+import TodoPage from "./pages/TodoPage"
 
 import { useTodo } from "./component/todo/TodoData";
 import ProtectedRoute from "./pages/ProtectRoute";
@@ -37,6 +38,7 @@ const App = () => {
                 path="/todo"
                 element={
                   <ProtectedRoute isLoggedIn={isLoggedIn}>
+                     {/* <TodoPage /> */}
                     <MainFrame
                       activeId="todo"
                       todo={todo}
@@ -71,7 +73,7 @@ const App = () => {
                   <ProtectedRoute isLoggedIn={isLoggedIn}>
                     <Profile
                       isLoggedIn={isLoggedIn}
-                      userInfo={{ email: "test@test.com", nickname: "홍길동" }} // 임시
+                      userInfo={{ email: "test@test.com", nickname: "김유하" }} // 임시
                       setUserInfo={() => {}}
                     />
                   </ProtectedRoute>
