@@ -1,98 +1,90 @@
-/* 검색 폼에 스타일 적용 */
-.TodoList .searchbar{
-  /* margin-bottom: 20px; */
-  width: 100%;
-  border: none;
-  border-bottom: 1px solid rgb(220, 220, 220);
+/* ============================
+   📄 전체 TodoList 영역 기본 글씨 크기 확대
+   ============================ */
+.TodoList {
+  font-size: 18px;              /* 기본 폰트 18px */
+  padding: 0 24px;              /* 좌우 패딩 추가 */
   box-sizing: border-box;
-  padding-top: 15px;
-  padding-bottom: 15px;
 }
 
-/* 검색 폼을 클릭했을 때의 스타일 적용 */
-.TodoList .searchbar:focus{
-  outline: none;
-  border-bottom: 1px solid #1f93ff;
-}
 
-.list_wrapper {
-  background: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 20px;
-}
-
-/* 할 일 요약 갯수 표시 */
-.summary-card {
-  flex: 1;
-  background: white;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #eee;
-  text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.summary-card .label {
-  font-size: 12px;
-  color: #888;
-  display: block;
-}
-
-/* todo 작성하기 커버 */
-.todo-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-  transition: 0.2s;
-}
-
-.searchbar:focus {
-  border-bottom: 2px solid #000;
-  outline: none;
-}
-
-/* 검색창 전체 영역 */
-.search_wrapper {
+/* ============================
+   🔍 검색창 (미니멀 버전)
+   ============================ */
+.TodoList .search_wrapper {
   position: relative;
-  margin-top: 15px;
+  margin-top: 28px;
 }
 
-/* 기본 검색창 디자인 */
 .TodoList .searchbar {
   width: 100%;
-  padding: 14px 16px;
-  border: 1px solid #cfe4ff;          /* 연파랑 라인 */
-  background: #f7fbff;                /* 아주 옅은 파랑 배경 */
-  border-radius: 10px;
+  padding: 12px 26px 12px 24px; /* 패딩 증가 */
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,0.18);
+  background: transparent;
+  font-size: 18px;               /* 폰트 키움 */
   outline: none;
-  font-size: 15px;
-  transition: 0.2s ease;
+  transition: border-color 0.15s ease;
 }
 
-/* 포커스 시 조금 더 선명한 파랑으로 강조 */
 .TodoList .searchbar:focus {
-  background: #eef6ff;
-  border-color: #4da3ff;
-  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.25);
+  border-bottom: 1px solid rgba(0,0,0,0.45);
 }
 
 .search_wrapper button {
   position: absolute;
-  right: 12px;
+  right: 0px;
   top: 50%;
   transform: translateY(-50%);
-  background: #dbe9ff;
+  background: transparent;
   border: none;
-  padding: 3px 7px;
-  border-radius: 6px;
   cursor: pointer;
-  font-size: 12px;
-  color: #4d8ed4;
-  transition: 0.2s;
+  font-size: 18px;
+  opacity: 0.45;
 }
 
 .search_wrapper button:hover {
-  background: #bcd4ff;
+  opacity: 0.7;
 }
 
+
+/* ============================
+   📄 리스트 컨테이너 — 문서 느낌 유지
+   ============================ */
+.list_wrapper {
+  margin-top: 30px;
+  padding: 0 4px;                /* 리스트 안쪽도 약간 패딩 */
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+
+/* ============================
+   🔢 요약 카드 — 더 크게
+   ============================ */
+.summary-card {
+  flex: 1;
+  background: #F7F6F2;
+  padding: 20px 0;              /* 여백 증가 */
+  text-align: center;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.summary-card .label {
+  font-size: 14px;              /* 더 큼직하게 */
+  opacity: 0.6;
+  display: block;
+}
+
+
+/* ============================
+   📝 TodoItem 카드 hover 제거 (심플 유지)
+   ============================ */
+.todo-card:hover {
+  transform: none;
+  box-shadow: none;
+}

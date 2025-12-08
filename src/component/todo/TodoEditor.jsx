@@ -1,23 +1,30 @@
+// src/component/todo/TodoEditor.jsx
 import { useRef, useState } from "react";
 
 const TodoEditor = ({ onCreate }) => {
   const [content, setContent] = useState("");
-  const inputRef = useRef();
-
-  const onKeyDown = (e) => {
-    if (e.keyCode === 13) onSubmit();
-  };
+  const [isComposing, setIsComposing] = useState(false);
+  const inputRef = useRef(null);
 
   const onChangeContent = (e) => {
     setContent(e.target.value);
   };
 
+  const onKeyDown = (e) => {
+    if (e.key === "Enter") {
+      if (e.nativeEvent.isComposing || isComposing) return;
+      e.preventDefault();
+      onSubmit();
+    }
+  };
+
   const onSubmit = () => {
-    if (!content) {
-      inputRef.current.focus();
+    const trimmed = content.trim();
+    if (!trimmed) {
+      inputRef.current?.focus();
       return;
     }
-    onCreate(content);
+    onCreate(trimmed);
     setContent("");
   };
 
@@ -25,23 +32,22 @@ const TodoEditor = ({ onCreate }) => {
     <div
       className="TodoEditor"
       style={{
-        backgroundColor: "white",
-        border: "1px solid #eee",
-        borderRadius: "12px",
-        padding: "20px",
-        marginTop: "20px",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+        width: "100%",
+        margin: "0 auto",
+        padding: "12px 0",
+        borderBottom: "1px dashed rgba(0,0,0,0.15)",
+        background: "transparent",
       }}
     >
       <h4
         style={{
-          marginBottom: "15px",
+          marginBottom: "12px",
           fontSize: "16px",
-          fontWeight: "bold",
+          fontWeight: 500,
           color: "#333",
         }}
       >
-        새로운 Todo 작성하기 ✏️
+        ✏️ 새로운 Todo 작성하기
       </h4>
 
       <div
@@ -49,21 +55,24 @@ const TodoEditor = ({ onCreate }) => {
         style={{
           display: "flex",
           gap: "10px",
-          alignItems: "center",
+          width: "100%",
         }}
       >
         <input
           ref={inputRef}
           value={content}
           onChange={onChangeContent}
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
           onKeyDown={onKeyDown}
-          placeholder="오늘의 할 일을 입력하세요."
+          placeholder="  오늘의 할 일을 입력하세요."
           style={{
             flexGrow: 1,
-            padding: "10px 8px",
+            padding: "10px 4px",
             border: "none",
-            borderBottom: "2px solid #eee",
-            fontSize: "15px",
+            borderBottom: "1px solid rgba(0,0,0,0.22)",
+            fontSize: "16px",
+            background: "transparent",
             outline: "none",
           }}
         />
@@ -71,15 +80,14 @@ const TodoEditor = ({ onCreate }) => {
         <button
           onClick={onSubmit}
           style={{
-            padding: "10px 18px",
-            backgroundColor: "#3dd176ff",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
+            padding: "8px 14px",
+            background: "transparent",
+            border: "1px solid rgba(0,0,0,0.3)",
+            borderRadius: "5px",
             cursor: "pointer",
-            fontWeight: "bold",
-            fontSize: "14px",
-            transition: "0.2s",
+            fontSize: "16px",
+            whiteSpace: "nowrap",
+            color: "#333",
           }}
         >
           추가
