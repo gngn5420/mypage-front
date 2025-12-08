@@ -14,22 +14,28 @@ import ProtectedRoute from "./pages/ProtectRoute";
 import NotFound from "./pages/NotFound";
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // 로그인 한 상태 
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 한 상태 
+  const [userInfo, setUserInfo] = useState({});  // 로그인한 사용자 정보 상태 관리
   const { todo, onCreate, onUpdate, onDelete } = useTodo(); // todoList 자료 불러오기 
+  
 
   return (
     <BrowserRouter>
       <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-        <TopNavi isLoggedIn={isLoggedIn} />
+        <TopNavi isLoggedIn={isLoggedIn} /> {/* 로그인 상태에 따라 메뉴 보여주기 */}
 
         <div style={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-          <SideBar isLoggedIn={isLoggedIn} />
+          <SideBar isLoggedIn={isLoggedIn} /> {/* 로그인 상태에 따라 사이드바 메뉴 보여주기 */}
 
           <section style={{ flexGrow: 1, overflowY: "auto", background: "#fafafa" }}>
             <Routes>
               {/* PUBLIC ROUTES */}
               <Route path="/" element={<MainFrame activeId="home" />} />
-              <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+              {/* <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} /> */}
+              <Route 
+                path="/login" 
+                element={<Login setIsLoggedIn={setIsLoggedIn} setUserInfo={setUserInfo} />} 
+              />
               <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
 
               {/* PRIVATE ROUTES */}
@@ -71,8 +77,8 @@ const App = () => {
                   <ProtectedRoute isLoggedIn={isLoggedIn}>
                     <Profile
                       isLoggedIn={isLoggedIn}
-                      userInfo={{ email: "test@test.com", nickname: "홍길동" }} // 임시
-                      setUserInfo={() => {}}
+                      userInfo={userInfo}   // userInfo를 Profile로 전달
+                      setUserInfo={setUserInfo}  // setUserInfo를 Profile로 전달
                     />
                   </ProtectedRoute>
                 }

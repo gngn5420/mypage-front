@@ -23,6 +23,7 @@ const Profile = ({ isLoggedIn, userInfo = {}, setUserInfo }) => {
             navigate("/login");
             return;
         }
+        
         setNickname(userInfo.nickname || "");
         setEmail(userInfo.email || "");
     }, [isLoggedIn, userInfo, navigate]);
