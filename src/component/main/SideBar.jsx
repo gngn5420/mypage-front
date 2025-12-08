@@ -6,7 +6,8 @@ const menuItems = [
   { id: "todo", path: "/todo", name: "TODO LIST", year: "2026", subtitle: "할 일 리스트" },
   { id: "habit", path: "/habit", name: "HABIT TRACKER", year: "2026", subtitle: "습관 추적기" },
   { id: "news", path: "/news", name: "NEWS SUMMARY", year: "2026", subtitle: "경제뉴스" },
-  { id: "profile", path: "/profile", name: "MY PAGE", year: "2026", subtitle: "개인정보" }
+  { id: "profile", path: "/profile", name: "MY PAGE", year: "2026", subtitle: "개인정보" },
+  { id: "admin", path: "/admin", name: "ADMIN PAGE", year: "2026", subtitle: "관리자 페이지" }
 ];
 
 const Sidebar = () => {

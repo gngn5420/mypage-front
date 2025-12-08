@@ -1,11 +1,40 @@
-import React from "react";
 
-const TodoItem = ({ id, content, isDone, createDate, onUpdate, onDelete }) => {
+
+
+import React, { useState, useEffect } from "react";
+
+const TodoItem = ({
+  id,
+  content,
+  isDone,
+  createDate,
+  onToggle,
+  onEdit,
+  onDelete,
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(content);
+  const [enterPressed, setEnterPressed] = useState(false);
+
+  useEffect(() => {
+    setEditValue(content);
+  }, [content]);
+
+  const finishEdit = () => {
+    if (enterPressed) return;
+    setIsEditing(false);
+
+    const trimmed = editValue.trim();
+    if (trimmed && trimmed !== content.trim()) {
+      onEdit(id, trimmed);
+    }
+  };
+
   return (
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "28px 1fr 120px 70px",
+        gridTemplateColumns: "28px 1fr 150px 70px",
         alignItems: "center",
         padding: "12px 0",
         borderBottom: "1px dashed rgba(0,0,0,0.15)",
@@ -13,62 +42,85 @@ const TodoItem = ({ id, content, isDone, createDate, onUpdate, onDelete }) => {
         fontSize: "18px",
       }}
     >
-
-      {/* 체크박스 - 초미니멀 */}
       <input
         type="checkbox"
         checked={isDone}
-        onChange={() => onUpdate(id)}
-        style={{
-          width: "18px",
-          height: "18px",
-          cursor: "pointer",
-          accentColor: "#333",     // 시스템 체크 스타일로 가장 깔끔함
-        }}
+        onChange={() => onToggle(id)}
+        style={{ width: "18px", height: "18px", cursor: "pointer" }}
       />
 
-      {/* 내용 */}
       <div
         style={{
           paddingLeft: "10px",
           textDecoration: isDone ? "line-through" : "none",
           opacity: isDone ? 0.55 : 1,
-          color: "#2F2F2F",
+          cursor: "pointer",
         }}
+        onClick={() => setIsEditing(true)}
       >
-        {content}
+        {isEditing ? (
+          <input
+            value={editValue}
+            autoFocus
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={finishEdit}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setEnterPressed(true);
+                setIsEditing(false);
+
+                const trimmed = editValue.trim();
+                if (trimmed && trimmed !== content.trim()) {
+                  onEdit(id, trimmed);
+                }
+
+                setTimeout(() => setEnterPressed(false), 0);
+              }
+            }}
+            style={{
+              width: "100%",
+              fontSize: "18px",
+              border: "none",
+              background: "transparent",
+              outline: "none",
+            }}
+          />
+        ) : (
+          editValue
+        )}
       </div>
 
-      {/* 날짜 */}
       <div
         style={{
           fontSize: "16px",
           opacity: 0.6,
           textAlign: "right",
-          paddingRight: "8px",
+          paddingRight: "14px",
         }}
       >
-        {new Date(createDate).toLocaleDateString()}
+        {/* {new Date(createDate).toLocaleDateString()} */}
+        {new Date(createDate).toLocaleDateString("ko-KR", {
+          month: "long",
+          day: "2-digit",
+        })}
+
+
       </div>
 
-      {/* 삭제 버튼 - 아주 심플 */}
       <button
         onClick={() => onDelete(id)}
         style={{
           background: "transparent",
           border: "1px solid rgba(0,0,0,0.25)",
           padding: "8px 14px",
-          fontSize: "15px",
           cursor: "pointer",
           borderRadius: "5px",
-          color: "#333",
         }}
       >
         삭제
       </button>
-
     </div>
   );
 };
 
-export default React.memo(TodoItem);
+export default TodoItem;

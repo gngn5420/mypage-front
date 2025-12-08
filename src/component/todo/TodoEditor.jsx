@@ -1,32 +1,32 @@
+// src/component/todo/TodoEditor.jsx
 import { useRef, useState } from "react";
 
 const TodoEditor = ({ onCreate }) => {
   const [content, setContent] = useState("");
-  const inputRef = useRef();
-
-  const onKeyDown = (e) => {
-    if (e.key === "Enter") onSubmit();
-  };
+  const [isComposing, setIsComposing] = useState(false);
+  const inputRef = useRef(null);
 
   const onChangeContent = (e) => {
     setContent(e.target.value);
   };
 
-  // const onSubmit = () => {
-  //   if (!content.trim()) {
-  //     inputRef.current.focus();
-  //     return;
-  //   }
-  //   onCreate(content);
-  //   setContent("");
-  // };
+  const onKeyDown = (e) => {
+    if (e.key === "Enter") {
+      if (e.nativeEvent.isComposing || isComposing) return;
+      e.preventDefault();
+      onSubmit();
+    }
+  };
 
   const onSubmit = () => {
-  if (!content.trim()) return;
-  onCreate(content);
-  setContent("");
-};
-
+    const trimmed = content.trim();
+    if (!trimmed) {
+      inputRef.current?.focus();
+      return;
+    }
+    onCreate(trimmed);
+    setContent("");
+  };
 
   return (
     <div
@@ -50,7 +50,6 @@ const TodoEditor = ({ onCreate }) => {
         ✏️ 새로운 Todo 작성하기
       </h4>
 
-      {/* 입력 박스 */}
       <div
         className="editor_wrapper"
         style={{
@@ -63,8 +62,10 @@ const TodoEditor = ({ onCreate }) => {
           ref={inputRef}
           value={content}
           onChange={onChangeContent}
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
           onKeyDown={onKeyDown}
-          placeholder="오늘의 할 일을 입력하세요."
+          placeholder="  오늘의 할 일을 입력하세요."
           style={{
             flexGrow: 1,
             padding: "10px 4px",

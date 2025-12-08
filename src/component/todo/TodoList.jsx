@@ -1,13 +1,14 @@
 import { useState, useMemo } from "react";
-import TodoItem from "./TodoItem";
+import TodoItem from './TodoItem'
 import TodoEditor from "./TodoEditor";
 import "./TodoList.css";
 
 const TodoList = ({
   todo = [],
-  onCreate = () => { },
-  onUpdate = () => { },
-  onDelete = () => { },
+  onCreate = () => {},
+  onToggle = () => {},
+  onEdit = () => {},
+  onDelete = () => {},
 }) => {
   const [search, setSearch] = useState("");
 
@@ -18,14 +19,13 @@ const TodoList = ({
     search === ""
       ? todo
       : todo.filter((it) =>
-        it.content.toLowerCase().includes(search.toLowerCase())
-      );
+          it.content.toLowerCase().includes(search.toLowerCase())
+        );
 
   const analyzeTodo = useMemo(() => {
     const totalCount = todo.length;
     const doneCount = todo.filter((it) => it.isDone).length;
     const notDoneCount = totalCount - doneCount;
-
     return { totalCount, doneCount, notDoneCount };
   }, [todo]);
 
@@ -97,7 +97,7 @@ const TodoList = ({
         <input
           value={search}
           onChange={onChangeSearch}
-          placeholder=" 검색어를 입력해주세요."
+          placeholder="  검색어를 입력해주세요."
           style={{
             width: "100%",
             padding: "8px 0px 8px 22px",
@@ -129,36 +129,40 @@ const TodoList = ({
         )}
       </div>
 
-      {/* TodoEditor — 폭 정확히 900px 맞춤 */}
+      {/* 입력 칸 (TodoEditor) */}
       <div
         style={{
           width: "100%",
           maxWidth: "900px",
           margin: "0 auto",
-          marginBottom: "30px",
+          marginBottom: "40px",
         }}
       >
         <TodoEditor onCreate={onCreate} />
       </div>
 
       {/* 리스트 */}
-      <div className="list_wrapper"
+      <div
+        className="list_wrapper"
         style={{
           width: "100%",
           maxWidth: "900px",
           margin: "0 auto",
-          marginTop: "10px"
-        }}>
+          marginTop: "10px",
+          marginBottom: "80px",
+        }}
+      >
         {getSearchResult().map((it) => (
-          <div
+          <TodoItem
             key={it.id}
-            style={{
-              padding: "12px 2px",
-              borderBottom: "1px dashed rgba(0,0,0,0.12)",
-            }}
-          >
-            <TodoItem {...it} onUpdate={onUpdate} onDelete={onDelete} />
-          </div>
+            id={it.id}
+            content={it.content}
+            isDone={it.isDone}
+            createDate={it.createDate}
+            onToggle={onToggle}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
         ))}
       </div>
     </div>
@@ -169,14 +173,16 @@ const SummaryCard = ({ label, value, color }) => (
   <div
     style={{
       flex: 1,
-      padding: "14px 0",
+      padding: "28px 0",
       textAlign: "center",
       background: "#F7F6F2",
       border: "1px solid rgba(0,0,0,0.08)",
     }}
   >
     <div style={{ fontSize: "14px", opacity: 0.6 }}>{label}</div>
-    <strong style={{ fontSize: "24px", color: color || "#333" }}>{value}</strong>
+    <strong style={{ fontSize: "24px", color: color || "#333" }}>
+      {value}
+    </strong>
   </div>
 );
 
