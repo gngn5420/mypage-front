@@ -120,37 +120,29 @@ import Admin from "./component/admin/Admin";
 
 
 // ⭐ 개발자 모드 ON/OFF
-const DEV_MODE = true;
+// const DEV_MODE = true;
 
 const App = () => {
   
   // DEV_MODE = true → 자동 로그인 처리
-  const [isLoggedIn, setIsLoggedIn] = useState(DEV_MODE ? true : false);
-
+  // 로그인 상태를 useState로 선언
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState({
-    nickname: DEV_MODE ? "개발자" : "",
-    email: DEV_MODE ? "dev@test.com" : "",
+    // nickname: DEV_MODE ? "개발자" : "",
+    // email: DEV_MODE ? "dev@test.com" : "",
   });
 
-  const { todo, onCreate, onUpdate, onDelete } = useTodo();
-  
 
   return (
     <BrowserRouter>
       <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-        
         <TopNavi isLoggedIn={isLoggedIn} />
-
         <div style={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-          
           <SideBar isLoggedIn={isLoggedIn} />
-
           <section style={{ flexGrow: 1, overflowY: "auto", background: "#fafafa" }}>
             <Routes>
 
-              {/* ----------------------
-                  PUBLIC ROUTES
-              ----------------------- */}
+              {/* PUBLIC ROUTES----------------------- */}
               <Route path="/" element={<MainFrame activeId="home" />} />
 
               <Route 
@@ -169,19 +161,14 @@ const App = () => {
               />
 
 
-              {/* ----------------------
-                  PRIVATE ROUTES
-              ----------------------- */}
+              {/* PRIVATE ROUTES ----------------------- */}
               <Route
                 path="/todo"
                 element={
-                  <ProtectedRoute isLoggedIn={isLoggedIn} dev={DEV_MODE}>
+                  // <ProtectedRoute isLoggedIn={isLoggedIn} dev={DEV_MODE}>
+                  <ProtectedRoute isLoggedIn={isLoggedIn}>
                     <MainFrame
                       activeId="todo"
-                      todo={todo}
-                      onCreate={onCreate}
-                      onUpdate={onUpdate}
-                      onDelete={onDelete}
                     />
                   </ProtectedRoute>
                 }
@@ -190,7 +177,8 @@ const App = () => {
               <Route
                 path="/habit"
                 element={
-                  <ProtectedRoute isLoggedIn={isLoggedIn} dev={DEV_MODE}>
+                  // <ProtectedRoute isLoggedIn={isLoggedIn} dev={DEV_MODE}>
+                  <ProtectedRoute isLoggedIn={isLoggedIn}>
                     <MainFrame activeId="habit" />
                   </ProtectedRoute>
                 }
@@ -199,7 +187,8 @@ const App = () => {
               <Route
                 path="/news"
                 element={
-                  <ProtectedRoute isLoggedIn={isLoggedIn} dev={DEV_MODE}>
+                  // <ProtectedRoute isLoggedIn={isLoggedIn} dev={DEV_MODE}>
+                  <ProtectedRoute isLoggedIn={isLoggedIn}>
                     <MainFrame activeId="news" />
                   </ProtectedRoute>
                 }
@@ -208,7 +197,8 @@ const App = () => {
               <Route
                 path="/profile"
                 element={
-                  <ProtectedRoute isLoggedIn={isLoggedIn} dev={DEV_MODE}>
+                  // <ProtectedRoute isLoggedIn={isLoggedIn} dev={DEV_MODE}>
+                  <ProtectedRoute isLoggedIn={isLoggedIn}>
                     <Profile
                       isLoggedIn={isLoggedIn}
                       userInfo={userInfo}
