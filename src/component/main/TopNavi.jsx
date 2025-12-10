@@ -8,60 +8,87 @@
 //       style={{
 //         display: "flex",
 //         justifyContent: "space-between",
-//         padding: "15px 30px",
-//         borderBottom: "1px solid #eee"
+//         alignItems: "center",
+//         padding: "25px 40px",
+//         borderBottom: "1px solid rgba(0,0,0,0.08)",
+//         background: "#F8F7F4",
+//         letterSpacing: "0.5px"
 //       }}
 //     >
-//       <h1 
-//         style={{ cursor: "pointer" }}
+//       {/* 다이어리 표지 느낌의 타이틀 */}
+//       <h1
+//         style={{
+//           cursor: "pointer",
+//           fontSize: "18px",
+//           fontWeight: 400,
+//           opacity: 0.85,
+//           letterSpacing: "1px",
+//           textTransform: "uppercase",
+//         }}
 //         onClick={() => navigate("/")}
 //       >
-//         MY DAILY LIFE
+//         My Daily Life
 //       </h1>
 
-//       <div style={{ display: "flex", gap: "20px", fontSize: "14px" }}>
-        
+//       <div
+//         style={{
+//           display: "flex",
+//           gap: "18px",
+//           fontSize: "14px",
+//           opacity: 0.75
+//         }}
+//       >
 //         {isLoggedIn ? (
 //           <>
-//             {/* 로그인 O */}
-//             <span 
-//               style={{ cursor: "pointer" }}
+//             {/* 로그인한 경우 */}
+//             <span
+//               style={{
+//                 cursor: "pointer",
+//                 letterSpacing: "0.5px"
+//               }}
 //               onClick={() => navigate("/profile")}
 //             >
-//               PROFILE
+//               Profile
 //             </span>
 
 //             <span
-//               style={{ cursor: "pointer" }}
+//               style={{
+//                 cursor: "pointer",
+//                 letterSpacing: "0.5px"
+//               }}
 //               onClick={() => {
-//                 // 실제 로그아웃은 로컬스토리지와 상태 초기화
 //                 localStorage.removeItem("token");
 //                 navigate("/login");
-//                 window.location.reload(); // 임시 초기화
+//                 window.location.reload(); 
 //               }}
 //             >
-//               LOGOUT
+//               Logout
 //             </span>
 //           </>
 //         ) : (
 //           <>
-//             {/* 로그인 X */}
-//             <span 
-//               style={{ cursor: "pointer" }}
+//             {/* 로그인하지 않았을 경우 */}
+//             <span
+//               style={{
+//                 cursor: "pointer",
+//                 letterSpacing: "0.5px"
+//               }}
 //               onClick={() => navigate("/login")}
 //             >
-//               LOGIN
+//               Login
 //             </span>
 
-//             <span 
-//               style={{ cursor: "pointer" }}
+//             <span
+//               style={{
+//                 cursor: "pointer",
+//                 letterSpacing: "0.5px"
+//               }}
 //               onClick={() => navigate("/register")}
 //             >
-//               REGISTER
+//               Register
 //             </span>
 //           </>
 //         )}
-
 //       </div>
 //     </header>
 //   );
@@ -71,8 +98,19 @@
 
 import { useNavigate } from "react-router-dom";
 
-const TopNavi = ({ isLoggedIn }) => {
+const TopNavi = ({ isLoggedIn, setIsLoggedIn, setUserInfo }) => {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userInfo");
+
+    // ✅ 상태 즉시 반영
+    setIsLoggedIn(false);
+    setUserInfo({});
+
+    navigate("/login");
+  };
 
   return (
     <header
@@ -86,7 +124,6 @@ const TopNavi = ({ isLoggedIn }) => {
         letterSpacing: "0.5px"
       }}
     >
-      {/* 다이어리 표지 느낌의 타이틀 */}
       <h1
         style={{
           cursor: "pointer",
@@ -111,49 +148,31 @@ const TopNavi = ({ isLoggedIn }) => {
       >
         {isLoggedIn ? (
           <>
-            {/* 로그인한 경우 */}
             <span
-              style={{
-                cursor: "pointer",
-                letterSpacing: "0.5px"
-              }}
+              style={{ cursor: "pointer", letterSpacing: "0.5px" }}
               onClick={() => navigate("/profile")}
             >
               Profile
             </span>
 
             <span
-              style={{
-                cursor: "pointer",
-                letterSpacing: "0.5px"
-              }}
-              onClick={() => {
-                localStorage.removeItem("token");
-                navigate("/login");
-                window.location.reload(); 
-              }}
+              style={{ cursor: "pointer", letterSpacing: "0.5px" }}
+              onClick={handleLogout}
             >
               Logout
             </span>
           </>
         ) : (
           <>
-            {/* 로그인하지 않았을 경우 */}
             <span
-              style={{
-                cursor: "pointer",
-                letterSpacing: "0.5px"
-              }}
+              style={{ cursor: "pointer", letterSpacing: "0.5px" }}
               onClick={() => navigate("/login")}
             >
               Login
             </span>
 
             <span
-              style={{
-                cursor: "pointer",
-                letterSpacing: "0.5px"
-              }}
+              style={{ cursor: "pointer", letterSpacing: "0.5px" }}
               onClick={() => navigate("/register")}
             >
               Register

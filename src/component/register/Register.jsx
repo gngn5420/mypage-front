@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../../api/axios";
 import instance from "../../api/axios";
 
 const Register = () => {
@@ -13,37 +12,7 @@ const Register = () => {
 
     const navigate = useNavigate();
 
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-    //     setErrorMessage("");
-
-    //     if (username.trim().length < 4) {
-    //         setErrorMessage("아이디는 최소 4자 이상이어야 합니다.");
-    //         return;
-    //     }
-
-    //     if (nickname.length < 2) {
-    //         setErrorMessage("닉네임은 2자 이상 입력해야 합니다.");
-    //         return;
-    //     }
-
-    //     if (password.length < 6) {
-    //         setErrorMessage("비밀번호는 최소 6자 이상이어야 합니다.");
-    //         return;
-    //     }
-
-    //     if (password !== confirmPassword) {
-    //         setErrorMessage("비밀번호가 일치하지 않습니다.");
-    //         return;
-    //     }
-
-    //     alert("회원가입이 완료되었습니다!");
-
-    //     // 가입 후 로그인 페이지로 이동
-    //     navigate("/login");
-    // };
-
-const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
