@@ -49,11 +49,39 @@ const Register = () => {
         alert("회원가입이 완료되었습니다!");
         navigate("/login");
 
-    } catch (err) {
-        setErrorMessage("회원가입 과정에서 오류가 발생했습니다.");
-    }
-};
+    }  catch (err) {
+  const status = err?.response?.status;
+  const data = err?.response?.data;
 
+  const msg =
+    data?.message ||
+    data?.error ||
+    data?.msg ||
+    (typeof data === "string" ? data : "");
+
+  if (status === 409 && msg) {
+    // 메시지 내용으로 분기(최소 변경)
+    if (msg.includes("아이디")) {
+      setErrorMessage("이미 사용 중인 아이디입니다.");
+      return;
+    }
+    if (msg.includes("이메일")) {
+      setErrorMessage("이미 사용 중인 이메일입니다.");
+      return;
+    }
+    if (msg.includes("닉네임")) {
+      setErrorMessage("이미 사용 중인 닉네임입니다.");
+      return;
+    }
+
+    setErrorMessage(msg);
+    return;
+  }
+
+  setErrorMessage("회원가입 과정에서 오류가 발생했습니다.");
+}
+
+};
 
     // 로그인과 동일 input 스타일
     const inputStyle = {

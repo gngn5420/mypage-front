@@ -157,6 +157,7 @@ function HabitTracker() {
     });
   };
 
+
   // ✅ 이름 수정 완료 서버 연동
   const applyEdit = async () => {
     if (!editingName.trim()) {
@@ -257,7 +258,7 @@ function HabitTracker() {
     };
   }, [progressData]);
 
-  // ✅ 차트 옵션
+  // ✅ 차트 옵션 (툴팁 진행률 표시 버전)
   const chartOptions = useMemo(() => {
     return {
       responsive: true,
@@ -292,6 +293,31 @@ function HabitTracker() {
       },
     };
   }, []);
+
+  // 툴팁 진행률 표시 없는 버전
+  // const chartOptions = useMemo(() => {
+  // return {
+  //     responsive: true,
+  //     maintainAspectRatio: false,
+  //     interaction: {
+  //       mode: "nearest",
+  //       intersect: true,
+  //     },
+  //     plugins: {
+  //       legend: { display: false },
+  //       tooltip: {
+  //         enabled: false, // ✅ 도트 툴팁만 OFF
+  //       },
+  //     },
+  //     scales: {
+  //       y: {
+  //         min: 0,
+  //         max: 100,
+  //         ticks: { callback: (v) => `${v}%` },
+  //       },
+  //     },
+  //   };
+  // }, []);
 
   // ✅ 특정 습관의 기간 진행률
   const getHabitPeriodPercent = (habitId, dates) => {
@@ -566,25 +592,6 @@ function HabitTracker() {
           </div>
         );
       })}
-
-      {/* ✅ 4번: 표 밑 “진행률 숫자만” 한 줄 */}
-      {/* {habits.length > 0 && (
-        <div
-          style={{
-            marginTop: "14px",
-            padding: "10px 6px",
-            fontSize: "12.5px",
-            opacity: 0.75,
-            borderBottom: "1px dashed rgba(0,0,0,0.08)",
-            textAlign: "left",
-          }}
-        >
-          <span style={{ fontWeight: 700, marginRight: "8px" }}>
-            진행률
-          </span>
-          {progressData.map((v) => Math.round(v)).join(" · ")}
-        </div>
-      )} */}
 
       {/* ✅ 진행률 Row: 리스트 그리드와 정확히 정렬 */}
       {habits.length > 0 && (
