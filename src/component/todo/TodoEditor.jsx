@@ -1,8 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import todoApi from '../../api/todoApi'
+import { useEffect, useRef, useState } from "react"
+import instance from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 
+// 로그인 한 사용자 정보를 가져온 뒤, username을 포함해서 todo를 생성하고
+// Enter 버튼으로 할 일을 추가하는 입력 컴포넌트 
+
 // 날짜 출력 형식 
+// Date 객체를 2025-12-12T10:30:45 같은 문자열로 바꿔주는 유틸
 const formatDate = (date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -15,15 +19,15 @@ return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 };
 
 // 입력필드에서 Enter 누르면 oncreate 함수를 호출 -> 새로운 할 일 추가 
-const TodoEditor = ({ onCreate }) => {
+const TodoEditor = ({ onCreate }) => { // 이 함수를 호출하면 부모함수가 실행됨
   const [content, setContent] = useState("");
-  const [isComposing, setIsComposing] = useState(false);
-  const [username, setUsername] = useState("") // username 상태 추가 
-  const inputRef = useRef(null);
-  const navigate = useNavigate()
+  const [isComposing, setIsComposing] = useState(false); // 한글 입력 중인지 체크하는 플래그
+  const [username, setUsername] = useState("") // login된 사용자 username 저장 
+  const inputRef = useRef(null); // input DOM에 직접 포커스를 주려고 사용
+  const navigate = useNavigate() // 
 
 
-// 로그인된 사용자 정보 fetch
+// 로그인된 사용자 정보 fetch로 가져오기 (컴포넌트가 실행될 때 한 번 실행)
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -34,7 +38,7 @@ const TodoEditor = ({ onCreate }) => {
         }
 
         // 서버에서 로그인된 사용자 정보 받아오기
-        const response = await todoApi.get("/api/user/me", {  // 경로 수정: /api/user/me로 수정
+        const response = await instance.get("/api/user/me", {  // 경로 수정: /api/user/me로 수정
           headers: {
             Authorization: `Bearer ${token}`,  // JWT 토큰을 Authorization 헤더에 포함시켜 요청
           },
@@ -51,12 +55,12 @@ const TodoEditor = ({ onCreate }) => {
 
 
   const onChangeContent = (e) => {
-    setContent(e.target.value);
+    setContent(e.target.value); // input에 타이핑 할 때 마다 content 상태 업데이트 
   };
 
   const onKeyDown = (e) => {
-    if (e.key === "Enter") {
-      if (e.nativeEvent.isComposing || isComposing) return;
+    if (e.key === "Enter") { // Enter를 누르면 todo를 추가함 (Enter -> 한글 입력 중에는 글자 확정 용도로 쓰임)
+      if (e.nativeEvent.isComposing || isComposing) return; // 조합 중일 때는 무시 (한글 입력 깨지는 것 방지), 조합 중이 아니라면 
       e.preventDefault();
       onSubmit();
     }
@@ -72,7 +76,7 @@ const TodoEditor = ({ onCreate }) => {
 
     try {
         const token = localStorage.getItem("accessToken");
-        const response = await todoApi.post("/api/todo/add", {
+        const response = await instance.post("/api/todo/add", {
             content: trimmed,
             username: username,  // 받아온 username 사용
             complete: false,  // 완료 상태 초기값

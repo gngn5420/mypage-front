@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import TodoItem from "./TodoItem";
 import TodoEditor from "./TodoEditor";
-import "./TodoList.css";
 import axios from "../../api/axios";
 
 const TodoList = () => {
@@ -21,7 +20,7 @@ const TodoList = () => {
 
   useEffect(() => {
     fetchTodos();
-  }, [fetchTodos]);
+  }, [fetchTodos]); // fetchTodos가 바뀌면 실행하라
 
   // ✅ 생성
   // 가정: TodoEditor에서 서버 생성 후 "생성된 todo 객체"를 onCreate로 넘겨줌
@@ -157,8 +156,21 @@ const TodoList = () => {
         >
           🔍
         </span>
-
+          <label
+            htmlFor="todo-search"
+            style={{
+              position: "absolute",
+              left: "-9999px", // 화면에서는 숨기고, dom에서는 인식됨.
+              width: "1px",
+              height: "1px",
+              overflow: "hidden",
+            }}
+          >
+            할 일 검색
+          </label>
         <input
+          id="todo-search"
+          name="todoSearch"
           value={search}
           onChange={onChangeSearch}
           placeholder="  검색어를 입력해주세요."
@@ -214,6 +226,7 @@ const TodoList = () => {
           margin: "0 auto",
           marginTop: "10px",
           marginBottom: "80px",
+          padding: "0 4px" 
         }}
       >
         {filteredTodos.map((it) => (

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 
+// 할 일 1개를 담당하는 컴포넌트 
+// 부모함수에서 받은 데이터 변경 (토글/수정/삭제)
+
 const TodoItem = ({
   todoId,
   content,
@@ -9,26 +12,26 @@ const TodoItem = ({
   onUpdate,
   onDelete,
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(content ?? "");
-  const [enterPressed, setEnterPressed] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // 지금 수정 모드인지 여부 
+  const [editValue, setEditValue] = useState(content ?? ""); // input에 표시할 편집 중인 텍스트
+  const [enterPressed, setEnterPressed] = useState(false); // Enter로 편집 끝낼 때, blur와 중복 호출을 막음 
 
-  useEffect(() => {
+  useEffect(() => { // 부모에서 content가 바뀌면 editValue도 그걸로 덮여써서 내용이 안 어긋나게 동기화 해줌. 
     setEditValue(content ?? "");
   }, [content]);
 
-  const finishEdit = () => {
-    if (enterPressed) return;
+  const finishEdit = () => { // input이 blur될 때 (포커스 빠질 때) 호출 
+    if (enterPressed) return; // 중복 방지로 return 
 
-    setIsEditing(false);
-    const trimmed = (editValue ?? "").trim();
+    setIsEditing(false); // 수정 종료
+    const trimmed = (editValue ?? "").trim(); //
 
-    if (trimmed && trimmed !== (content ?? "").trim()) {
-      onUpdate(todoId, trimmed);
+    if (trimmed && trimmed !== (content ?? "").trim()) { // 내용이 있고, 원래 content와 다르면 
+      onUpdate(todoId, trimmed); // update 호출 -> 실제 수정은 부모에서 처리 
     }
   };
 
-  const safeDate = regDate ? new Date(regDate) : null;
+  const safeDate = regDate ? new Date(regDate) : null; //regdate가 있으면 Date 객체로 변환, 없으면 null 
 
   return (
     <div
@@ -46,7 +49,7 @@ const TodoItem = ({
       <input
         type="checkbox"
         id={`todo-checkbox-${todoId}`}
-        checked={!!complete}
+        checked={!!complete} // boolean 강제 변환
         onChange={() => onToggle(todoId)}
         style={{
           width: "18px",
@@ -68,6 +71,8 @@ const TodoItem = ({
       >
         {isEditing ? (
           <input
+            id={`todo-edit-${todoId}`}
+            name="todoContent"
             value={editValue}
             autoFocus
             onChange={(e) => setEditValue(e.target.value)}
@@ -77,9 +82,9 @@ const TodoItem = ({
                 setEnterPressed(true);
                 setIsEditing(false);
 
-                const trimmed = (editValue ?? "").trim();
-                if (trimmed && trimmed !== (content ?? "").trim()) {
-                  onUpdate(todoId, trimmed);
+                const trimmed = (editValue ?? "").trim(); // 앞 뒤 공백이 제거된 내용만 남김
+                if (trimmed && trimmed !== (content ?? "").trim()) { // 공백만 있는 값은 없데이트 안하겠다. 
+                  onUpdate(todoId, trimmed); // 실제 글자 내용이 같으면 update안하고 기존 내용과 실질적으로 다를 때만 업데이트하겠다.
                 }
 
                 setTimeout(() => setEnterPressed(false), 0);

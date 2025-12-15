@@ -12,7 +12,6 @@ import Profile from "./component/profile/Profile";
 import ProtectedRoute from "./pages/ProtectRoute";
 import NotFound from "./pages/NotFound";
 
-// import AdminPage from "./pages/Adminpage";
 import Admin from "./component/admin/Admin";
 import AdminRoute from "./pages/AdminRoute";
 
@@ -110,9 +109,9 @@ const App = () => {
 
               {/* <Route path="/admin" element={<Admin />} /> */}
               <Route
-                path="/admin"
+                path="/admin" 
                 element={
-                  <AdminRoute isLoggedIn={isLoggedIn} userInfo={userInfo}>
+                  <AdminRoute isLoggedIn={isLoggedIn} userInfo={userInfo}> 
                     <Admin />
                   </AdminRoute>
                 }
