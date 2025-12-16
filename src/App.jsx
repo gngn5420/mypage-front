@@ -30,6 +30,14 @@ const App = () => {
     };
   });
 
+  // ✅ 공통 로그아웃 함수
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userInfo");
+    setIsLoggedIn(false);
+    setUserInfo({});
+  };
+
   return (
     <BrowserRouter>
       <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
@@ -41,7 +49,8 @@ const App = () => {
         <div style={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
           <SideBar 
           isLoggedIn={isLoggedIn} 
-          userInfo={userInfo} />
+          userInfo={userInfo} 
+          onLogout={handleLogout}/>
           
           <section style={{ flexGrow: 1, overflowY: "auto", background: "#fafafa" }}>
             <Routes>
@@ -99,6 +108,8 @@ const App = () => {
                       isLoggedIn={isLoggedIn}
                       userInfo={userInfo}
                       setUserInfo={setUserInfo}
+                      // setIsLoggedIn={setIsLoggedIn}
+                      onLogout={handleLogout}
                     />
                   </ProtectedRoute>
                 }

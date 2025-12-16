@@ -24,31 +24,28 @@ const Login = ({ setIsLoggedIn, setUserInfo }) => {
         password,
       });
 
+      // ✅ 성공 케이스
       if (response.data && response.data.token) {
         const token = response.data.token;
 
-        // ✅ 토큰 저장 (App 초기복원 키와 통일)
+        // 토큰 저장
         localStorage.setItem("accessToken", token);
 
-        // ✅ 로그인 응답 기반 userInfo 구성 (+ role)
+        // 유저 정보 구성
         const nextUserInfo = {
           username: response.data.username,
           nickname: response.data.nickname,
           email: response.data.email,
-          role: response.data.role, // DB 기준 ADMIN/USER 기대
+          role: response.data.role,
         };
 
-        // ✅ userInfo 저장
+        // userInfo 저장
         localStorage.setItem("userInfo", JSON.stringify(nextUserInfo));
 
-        // -------------------------------
-        // ✅ 콘솔 디버그 (여기부터)
-        // -------------------------------
+        // 디버그 로그
         console.log("✅ 로그인 응답 raw:", response.data);
         console.log("✅ 응답 role:", response.data.role);
-
         console.log("✅ nextUserInfo(저장 예정):", nextUserInfo);
-
         console.log(
           "✅ LS accessToken exists?",
           !!localStorage.getItem("accessToken")
@@ -57,28 +54,57 @@ const Login = ({ setIsLoggedIn, setUserInfo }) => {
           "✅ LS userInfo:",
           JSON.parse(localStorage.getItem("userInfo"))
         );
-
-        // state 반영 체크용
         console.log("✅ setUserInfo 호출 role:", nextUserInfo.role);
-        // -------------------------------
-        // ✅ 콘솔 디버그 (여기까지)
-        // -------------------------------
 
-        // ✅ 로그인 상태 반영
+        // 상태 반영
         setIsLoggedIn(true);
         setUserInfo(nextUserInfo);
 
         // 홈으로 이동
         navigate("/");
-      } else {
-        setErrorMessage("로그인에 실패했습니다. 아이디 또는 비밀번호를 확인하세요.");
+        return;
       }
+
+      // 응답은 왔는데 token이 없는 경우
+      setErrorMessage(
+        "로그인에 실패했습니다. 아이디 또는 비밀번호를 확인하세요."
+      );
     } catch (err) {
-      setErrorMessage("로그인에 실패했습니다. 아이디 또는 비밀번호를 확인하세요.");
       console.error("❌ 로그인 에러:", err);
-      if (err?.response) {
+      if (err && err.response) {
         console.error("❌ 서버 응답:", err.response.data);
       }
+
+      const status = err?.response?.status;
+      const data = err?.response?.data || {};
+
+      // 백엔드에서 어떤 필드명을 쓰든 대응 (reason 또는 code)
+      const reason = data.reason || data.code;
+
+      // 1) 없는 아이디
+      if (status === 401 && reason === "NO_SUCH_USER") {
+        setErrorMessage("존재하지 않는 아이디입니다.");
+        return;
+      }
+
+      // 2) 비밀번호 오류
+      if (status === 401 && reason === "BAD_PASSWORD") {
+        setErrorMessage("비밀번호가 일치하지 않습니다.");
+        return;
+      }
+
+      // 4) 정지 계정
+      if (status === 403 && reason === "SUSPENDED") {
+        setErrorMessage(
+          "정지된 계정입니다.\n자세한 내용은 관리자에게 문의해 주세요."
+        );
+        return;
+      }
+
+      // 5) 기타 서버 에러
+      setErrorMessage(
+        "로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+      );
     }
   };
 
@@ -128,10 +154,18 @@ const Login = ({ setIsLoggedIn, setUserInfo }) => {
           display: "flex",
           flexDirection: "column",
           gap: "18px",
+          // ❌ 여기에는 textAlign/whiteSpace 빼고
         }}
       >
         {errorMessage && (
-          <p style={{ color: "#b33a3a", fontSize: "14px" }}>
+          <p
+            style={{
+              color: "#b33a3a",
+              fontSize: "14px",
+              whiteSpace: "pre-line", // \n 줄바꿈
+              textAlign: "center",    // 가운데 정렬
+            }}
+          >
             {errorMessage}
           </p>
         )}
